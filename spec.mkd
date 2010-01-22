@@ -1,0 +1,123 @@
+# NGI (Node Gateway Interface)
+
+The intention of NGI is to provide a standard interface between servers and applications implemented in node.js. Unlike JSGI it does NOT attempt to provide support for a blocking API or other features that might cause incompatibility in node.js.
+
+## Server and Application
+
+NGI is a gateway specification between two actors, the Server and the Application. An NGI compliant server listens on a socket for HTTP connections and is responsible for creating NGI compliant objects and passing them to an NGI compliant Application. An NGI compliant Application is a single function that takes 3 arguments; connection, request, response.
+
+<blockquote>
+  var application = function (connection, request, response) { 
+      response.start(200, [['content-type','text/plain']]);
+      response.sendBody('Hello World!');
+      response.end();
+    }
+</blockquote>
+
+## NGI Objects
+
+NGI specifies 3 objects which provide a non-blocking and evented bridge between any NGI Server and NGI Application. All objects are derived from [events.EventEmitter defined by node.js](http://nodejs.org/api.html#_events). In addition to emitting events NGI objects define additional attributes specified in later sections.
+
+NGI Objects are passed to the Application only after all HTTP headers have been sent and parsed for a given HTTP request.
+
+## Connection
+
+The connection object is responsible for emitting events related to the underlying socket conditions below the TCP/IP Application layer where HTTP is specified.
+
+Connection MUST include one boolean attribute **ssl** which if *true* means the transport used for this connection is SSL.
+
+### Events
+
+<table border=1>
+  <tr>
+    <td><strong>disconnect</strong></td>
+    <td>socket was disconnected abruptly. (*Arguments?*)<td>
+  </tr>
+  <tr>
+    <td><strong>close</strong></td>
+    <td>socket was closed cleanly. (*Arguments?*)</td>
+  </tr>
+</table>
+
+*There might be more events necessary for good SSL proxy conditions?*
+*Are there any useful socket layer events that could improve keep-alive performance?*
+
+## Request
+
+The Request object is responsible for emitting events related to the HTTP client request data. It also MUST include an attribute named **environ**. 
+
+environ is a JavaScript Object object. It MUST contain the following attributes.
+
+* **request_method** <br>
+  string. The HTTP method. MUST be all caps.
+* **full_path** <br>
+  string. Raw unparsed HTTP path.
+* **path** <br>
+  string. Path without query string and possibly with script_name removed.
+* **query_string** <br>
+  object. Parsed query string hash.
+* **content_type** <br>
+  string. The contents of any Content-Type fields in the HTTP request. If the request does not include Content-Type header this MUST be an empty string.
+* **protocol** <br>
+  number. Note that this is the HTTP protocol denoted by the request and may not end up being the protocol used for the session.
+* **server_protocol** <br>
+  number. The HTTP protocol the server is using for this session.
+* **headers** <br>
+  array. An array of 2 length arrays with strings for each value for each HTTP header in the request.
+
+Optional Attributes
+
+* **script_name** <br>
+  string. The initial portion of the request URL's "path" that corresponds to the application object, so that the application knows its virtual "location". This may be an empty string, if the application corresponds to the "root" of the server. 
+* **content_length** <br>
+  string. The contents of any Content-Length  fields in the HTTP request. 
+* **ngi_version** <br>
+  number. Version of this specification the Server is using. 
+
+### Events
+
+<table border=1>
+  <tr>
+    <td><strong>body<strong></td>
+    <td>One string argument. HTTP request body chunk. Server MUST not emit this event until the Application function has returned.</td>
+  </tr>
+</table>
+
+*Are there more events that might need to be emitted?*
+
+## Response
+
+The response object has two methods.
+
+* **start** <br>
+  Takes two arguments. First is a number for the corresponding HTTP status code. Second argument an array of 2 length arrays with string values for each response header. (Note: No, chunked sending of headers is not permitted because it will expose all kinds of funky browser bugs). When this method is called Response.status and Response.headers are set and the **start** event MUST be called before it sends Response.status and Response.headers to the client. Returns Promise.
+* **sendBody** <br>
+  Takes one string argument. This method will throw an exception if you attempt to call it before startResponse is called. The Server must set Response.chunk to the value sent to this method and then emit the **body** event before sending this chunk to the client. Returns Promise.
+* **end** <br>
+  Takes no arguments. Returns Promise.
+
+### Events
+
+<table border=1>
+  <tr>
+    <td><strong>start</strong></td>
+    <td>Called <strong>before</strong> status and headers are sent. Takes one argument, the Response object.</td>
+  </tr>
+  <tr>
+    <td><strong>body</strong></td>
+    <td>Called <strong>before</strong> status and headers are sent. Takes one argument, the Response object.</td>
+  </tr>
+  <tr>
+    <td><strong>end</strong></td>
+    <td>Called <strong>before</strong> EOF is sent to the client. Takes one argument, the Response object.</td>
+  </tr>
+</table>
+
+
+## Open questions
+
+I don't want to to go too far out of my way to support middleware in this specification if the support can be implemented in a compatible way on either the Server or Application side. That said, I think there may need to be some additional events added to the request object to allow middleware to set additional attributes in the environ in a compatible way.
+      
+      
+      
+      
