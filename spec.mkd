@@ -63,14 +63,14 @@ environ is a JavaScript Object object. It MUST contain the following attributes.
 * **server_protocol** <br>
   number. The HTTP protocol the server is using for this session.
 * **headers** <br>
-  array. An array of 2 length arrays with strings for each value for each HTTP header in the request.
+  array. An array of length 2 arrays with strings for each value for each HTTP header in the request.
 
 Optional Attributes
 
 * **script_name** <br>
   string. The initial portion of the request URL's "path" that corresponds to the application object, so that the application knows its virtual "location". This may be an empty string, if the application corresponds to the "root" of the server. 
 * **content_length** <br>
-  string. The contents of any Content-Length  fields in the HTTP request. 
+  number. The contents of any Content-Length  fields in the HTTP request. 
 * **ngi_version** <br>
   number. Version of this specification the Server is using. 
 
@@ -87,14 +87,20 @@ Optional Attributes
 
 ## Response
 
+Response.headers is initialized as an empty array. When setting headers you must use length 2 arrays with string values for header key/value pairs. 
+
+Response.headersSent should be sent to *true* until after they have been sent.
+
 The response object has two methods.
 
 * **start** <br>
-  Takes two arguments. First is a number for the corresponding HTTP status code. Second argument an array of 2 length arrays with string values for each response header. (Note: No, chunked sending of headers is not permitted because it will expose all kinds of funky browser bugs). When this method is called Response.status and Response.headers are set and the **start** event MUST be called before it sends Response.status and Response.headers to the client. Returns Promise.
+  Takes one arguments. Argument is a number for the corresponding HTTP status code. . When this method is called Response.status and Response.headers are set and the **start** event MUST be called before the Server sends Response.status and Response.headers to the client. Returns Promise. (Note: No, chunked sending of headers is not permitted because it will expose all kinds of funky browser bugs)
 * **sendBody** <br>
   Takes one string argument. This method will throw an exception if you attempt to call it before startResponse is called. The Server must set Response.chunk to the value sent to this method and then emit the **body** event before sending this chunk to the client. Returns Promise.
 * **end** <br>
   Takes no arguments. Returns Promise.
+
+After the headers are sent by the Server Response.headersSent should be set to *true* before the Promise success condition is met on the Promise returned for Response.start().
 
 ### Events
 
