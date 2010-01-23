@@ -6,13 +6,12 @@ The intention of NGI is to provide a standard interface between servers and appl
 
 NGI is a gateway specification between two actors, the Server and the Application. An NGI compliant server listens on a socket for HTTP connections and is responsible for creating NGI compliant objects and passing them to an NGI compliant Application. An NGI compliant Application is a single function that takes 3 arguments; connection, request, response.
 
-<blockquote>
-  var application = function (connection, request, response) { 
-      response.start(200, [['content-type','text/plain']]);
-      response.sendBody('Hello World!');
-      response.end();
-    }
-</blockquote>
+>  var application = function (connection, request, response) { 
+>      response.headers.push(['content-type','text/plain'])
+>      response.start(200);
+>      response.sendBody('Hello World!');
+>      response.end();
+>    }
 
 ## NGI Objects
 
