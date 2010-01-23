@@ -55,8 +55,8 @@ environ is a JavaScript Object object. It MUST contain the following attributes.
   string. Raw unparsed HTTP path.
 * **path** <br>
   string. Path without query string and possibly with script_name removed.
-* **query_string** <br>
-  object. Parsed query string hash.
+* **query** <br>
+  object. Parsed query string in to hash.
 * **content_type** <br>
   string. The contents of any Content-Type fields in the HTTP request. If the request does not include Content-Type header this MUST be an empty string.
 * **protocol** <br>
