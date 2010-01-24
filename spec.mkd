@@ -90,7 +90,7 @@ Optional Attributes
 
 Response.headers is initialized as an empty array. When setting headers you must use length 2 arrays with string values for header key/value pairs. 
 
-Response.headersSent should be sent to *true* until after they have been sent.
+Response.headersSent should be set to *false* until after they have been sent. After the "start" event is emitted and the headers are sent by the Server Response.headersSent should be set to *true* before the Promise success condition is met on the Promise returned for Response.start().
 
 The response object has two methods.
 
@@ -101,7 +101,7 @@ The response object has two methods.
 * **end** <br>
   Takes no arguments. Returns Promise.
 
-After the headers are sent by the Server Response.headersSent should be set to *true* before the Promise success condition is met on the Promise returned for Response.start().
+
 
 ### Events
 
