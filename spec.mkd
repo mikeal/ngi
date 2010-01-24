@@ -95,11 +95,11 @@ Response.headersSent should be set to *false* until after they have been sent. A
 The response object has two methods.
 
 * **start** <br>
-  Takes one arguments. Argument is a number for the corresponding HTTP status code. . When this method is called Response.status and Response.headers are set and the **start** event MUST be called before the Server sends Response.status and Response.headers to the client. Returns Promise. (Note: No, chunked sending of headers is not permitted because it will expose all kinds of funky browser bugs)
+  Takes one arguments. Argument is a number for the corresponding HTTP status code. . When this method is called Response.status and Response.headers are set and the **start** event MUST be called before the Server sends Response.status and Response.headers to the client. (Note: No, chunked sending of headers is not permitted because it will expose all kinds of funky browser bugs)
 * **sendBody** <br>
-  Takes one string argument. This method will throw an exception if you attempt to call it before startResponse is called. The Server must set Response.chunk to the value sent to this method and then emit the **body** event before sending this chunk to the client. Returns Promise.
+  Takes one string argument. This method will throw an exception if you attempt to call it before startResponse is called. The Server must set Response.chunk to the value sent to this method and then emit the **body** event before sending this chunk to the client.
 * **end** <br>
-  Takes no arguments. Returns Promise.
+  Takes no arguments. 
 
 
 
