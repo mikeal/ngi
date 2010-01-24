@@ -34,43 +34,21 @@ sys.inherits(Response, process.EventEmitter);
 Response.prototype.start = function (status) {
   this.status = status;
   this.emit("start", this);
-  var startPromise = new process.Promise();
-  var sendPromise = this.httpResponse.sendHeader(this.status, this.headers);
-  sendPromise.addCallback(function () {
-    this.headersSent = true;
-    startPromise.emitSuccess();
-  });
-  sendPromise.addErrback(function () {
-    startPromise.emitError();
-  }); 
-  return startPromise;
+  this.httpResponse.sendHeader(this.status, this.headers);
+  this.headersSent = true;
 };
 Response.prototype.sendBody = function (chunk) {
   if (!this.headersSent) {
     throw "Response.sendBody called before headers were sent.";
   }
   this.chunk = chunk;
-  this.emit("body", this);
-  var myPromise = new process.Promise();
-  var sendPromise = this.httpResponse.sendBody(chunk);
-  sendPromise.addCallback(function () {
-    myPromise.emitSuccess();
-  });
-  sendPromise.addErrback(function () {
-    myPromise.emitError();
-  });
-  return myPromise;
+  this.emit("body", this, chunk);
+  this.httpResponse.sendBody(chunk);
 };
 Response.prototype.end = function () {
+  // This section is odd because the standard http Server doesn't return a promise for some IO calls
   this.emit("end", this);
-  var endPromise = new process.Promise();
-  var finishPromise = this.httpResponse.finish();
-  finishPromise.addCallback(function () {
-    endPromise.emitSuccess();
-  });
-  finishPromise.addErrback(function () {
-    endPromise.emitError();
-  });
+  this.httpResponse.finish();
 };
 
 
@@ -109,13 +87,13 @@ Server.prototype.start = function () {
 
 
 var testApplication = function (connection, request, response) {
-  response.headers.push(['content-type','text/plain'])
+  response.headers.push(['content-type','text/plain']);
   response.start(200);
   response.sendBody('Hello World!');
   response.end();
 };
 
 var s = new Server(testApplication, 8080);
-s.start()
+s.start();
 
 
