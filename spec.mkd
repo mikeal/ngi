@@ -49,30 +49,30 @@ The Request object is responsible for emitting events related to the HTTP client
 
 environ is a JavaScript Object object. It MUST contain the following attributes.
 
-* **request_method** <br>
+* **requestMethod** <br>
   string. The HTTP method. MUST be all caps.
-* **full_path** <br>
+* **fullPath** <br>
   string. Raw unparsed HTTP path.
 * **path** <br>
   string. Path without query string and possibly with script_name removed.
 * **query** <br>
   object. Parsed query string in to hash.
-* **content_type** <br>
+* **contentType** <br>
   string. The contents of any Content-Type fields in the HTTP request. If the request does not include Content-Type header this MUST be an empty string.
 * **protocol** <br>
   number. Note that this is the HTTP protocol denoted by the request and may not end up being the protocol used for the session.
-* **server_protocol** <br>
+* **serverProtocol** <br>
   number. The HTTP protocol the server is using for this session.
 * **headers** <br>
   array. An array of length 2 arrays with strings for each value for each HTTP header in the request.
 
 Optional Attributes
 
-* **script_name** <br>
+* **scriptName** <br>
   string. The initial portion of the request URL's "path" that corresponds to the application object, so that the application knows its virtual "location". This may be an empty string, if the application corresponds to the "root" of the server. 
-* **content_length** <br>
+* **contentLength** <br>
   number. The contents of any Content-Length  fields in the HTTP request. 
-* **ngi_version** <br>
+* **ngiVersion** <br>
   number. Version of this specification the Server is using. 
 
 ### Events
