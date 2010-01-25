@@ -92,7 +92,7 @@ Response.headers is initialized as an empty array. When setting headers you must
 
 Response.headersSent should be set to *false* until after they have been sent. After the "start" event is emitted and the headers are sent by the Server Response.headersSent should be set to *true* before the Promise success condition is met on the Promise returned for Response.start().
 
-The response object has two methods.
+The response object MUST have the following three methods.
 
 * **start** <br>
   Takes one arguments. Argument is a number for the corresponding HTTP status code. . When this method is called Response.status and Response.headers are set and the **start** event MUST be called before the Server sends Response.status and Response.headers to the client. (Note: No, chunked sending of headers is not permitted because it will expose all kinds of funky browser bugs)
