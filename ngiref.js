@@ -2,8 +2,22 @@ var http = require("http"),
     sys = require("sys"),
     url = require("url");
     
-var Connection = function () {
+var Connection = function (httpConnection) {
+  if (httpConnection.verifyPeer) {
+    this.ssl = true;
+  } else {
+    this.ssl = false;
+  }
+  var c = this;
   process.EventEmitter.call(this);
+  this.httpConnection = httpConnection;
+  this.httpConnection.addListener("close", function (hadError) {
+    if (hadError) {
+      c.emit("disconnect");
+    } else {
+      c.emit("close");
+    }
+  });
 };
 sys.inherits(Connection, process.EventEmitter);
 
@@ -66,20 +80,20 @@ Server.prototype.start = function () {
       headers.push([headerName, httpRequest.headers[headerName]]);
     }
     var protocol = parseFloat(httpRequest.httpVersion);
-    var environ = { request_method  : httpRequest.method,
-                    full_path       : httpRequest.url,
-                    query           : uri.query,
-                    path            : uri.pathname,
-                    content_type    : httpRequest.headers['content-type'],
-                    content_length  : httpRequest.headers['content-length'],
-                    headers         : headers,
-                    protocol        : protocol,
-                    server_protocol : protocol
+    var environ = { requestMethod  : httpRequest.method,
+                    fullPath       : httpRequest.url,
+                    query          : uri.query,
+                    path           : uri.pathname,
+                    contentType    : httpRequest.headers['content-type'],
+                    contentLength  : httpRequest.headers['content-length'],
+                    headers        : headers,
+                    protocol       : protocol,
+                    serverProtocol : protocol
                   };
     var request = new Request(httpRequest, environ);
     var response = new Response(httpResponse);
-
-    s.application(undefined, request, response);
+    var connection = new Connection(httpRequest.connection)
+    s.application(connection, request, response);
   };
   this.httpServer = http.createServer(httpRequestListener);
   this.httpServer.listen(this.port, this.host);
