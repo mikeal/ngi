@@ -47,7 +47,7 @@ Connection MUST include one boolean attribute **ssl** which if *true* means the 
 
 The Request object is responsible for emitting events related to the HTTP client request data. It also MUST include an attribute named **environ**. 
 
-environ is a JavaScript Object object. It MUST contain the following attributes.
+environ is a JavaScript Object object. It MUST contain the following attributes:
 
 * **requestMethod** <br>
   string. The HTTP method. MUST be all caps.
@@ -66,7 +66,7 @@ environ is a JavaScript Object object. It MUST contain the following attributes.
 * **headers** <br>
   array. An array of length 2 arrays with strings for each value for each HTTP header in the request.
 
-Optional Attributes
+Optional environ attributes:
 
 * **scriptName** <br>
   string. The initial portion of the request URL's "path" that corresponds to the application object, so that the application knows its virtual "location". This may be an empty string, if the application corresponds to the "root" of the server. 
