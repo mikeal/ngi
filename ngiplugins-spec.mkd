@@ -1,0 +1,85 @@
+# NGI-Plugins
+
+This specification is based on the NGI specification which defines a portable interface between a Server and Application. The verbs "Server" and "Application" are defined in the NGI specification. "Request", "Response" and "Connection" objects are also defined in the NGI specification.
+
+This specification provides additional APIs as a NGI Application. It is intended to provide the necessary objects and APIs for developers to create interoperable plugins. The goal of the specification is actually to provide a better system for interoperability than current exists for so-called "middleware" in WSGI, Rake, and JSGI.
+
+## Plugin
+
+A valid NGI-Plugin is an object with a single method, init(), which accepts a single argument PluginController.
+
+## EventResolver
+
+NGI-Plugins defines a base object that inherits from EventEmitter called EventResolver. An event resolver MUST still support the default EventEmitter behavior but provides some additional methods for "resolving" alternate events. "Resolutions" are functions just like event listers but when an event is sent to be "resolved" it passed through each listener only until one of those "resolutions" returns an object.
+
+* **addResolution** <br>
+  method. Takes two arguments, a string argument for the name to resolve and a single function. This method is analogous to addListener.
+* **resolve** <br>
+  method. Takes at least one argument. The first argument MUST be the name to resolve, all additional arguments will be sent to the resolution methods.
+* **resolutions** <br>
+  object. Keys are names, values are arrays of the resolutions in the order they were added.
+
+## PluginController
+
+PluginController inherits from EventResolver. It defines a set of both events, resolvers and methods which form the base API for NGI Plugins.
+
+* **addPlugin** <br>
+  method. Takes a single argument, a valid plugin as defined by the previous section.
+* **setCache** <br>
+  method. Takes a single argument, a valid Cache object (Defined in a later section).
+
+### Resolvers
+
+<table border=1>
+  <tr>
+    <td><strong>cacheKey<strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>cacheResponse<strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>dispatch<strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>dispatchArgs<strong></td>
+    <td></td>
+  </tr>
+</table>
+
+### Events
+
+<table border=1>
+  <tr>
+    <td><strong>cacheKeyResolved<strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>cacheResponseResolved<strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>dispatchResolved<strong></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><strong>dispatchArgsResolved<strong></td>
+    <td></td>
+    <tr>
+      <td><strong>dispatchFinished<strong></td>
+      <td></td>
+    </tr>
+  </tr>
+</table>
+
+## Headers
+
+Object for manipulating Response headers interoperable and listening to header change events.
+
+## Cache
+
+* **get** <br>
+* **set** <br>
+
